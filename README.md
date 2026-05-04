@@ -26,6 +26,7 @@
 
 - **`METRLA/`**：METR-LA 数据与图相关的辅助文件（含邻接矩阵/距离等）  
   - **注意**：`METRLA/metr-la.h5` 是数据文件，已用 **Git LFS** 管理（见 `.gitattributes`）。
+  - **带 `new`/`with_newnodes` 的文件**：表示在原始 METR-LA 节点集合基础上**加入了虚拟节点（new/virtual nodes）**后重新生成的版本（例如 `distances_la_2012_with_newnodes.csv`、`adj_mat_with_newnodes.pkl`、`graph_sensor_ids_with_newnodes.txt`、`graph_sensor_locations_new.csv`）。
 
 - **`PEMSBAY/`**：PEMS-BAY 相关目录  
   - **注意**：`PEMSBAY/*.h5` 默认不上传（见 `.gitignore`），避免触发 GitHub 大文件限制。
