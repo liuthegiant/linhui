@@ -1,4 +1,5 @@
 import sys
+import argparse
 import os
 import shutil
 import numpy as np
@@ -700,27 +701,61 @@ def get_argv():
     11: is_SGA
     12: FEATURES
     '''
-    print('sys.argv', sys.argv)
-    P.IS_PRETRN = bool(int(sys.argv[1])) if len(sys.argv) >= 2 else True
-    P.R_TRN = float(sys.argv[2]) if len(sys.argv) >= 3 else 0.7
-    P.IS_EPOCH_1 = bool(int(sys.argv[3])) if len(sys.argv) >= 4 else False
-    P.seed = int(sys.argv[4]) if len(sys.argv) >= 5 else 100
-    P.TEMPERATURE = float(sys.argv[5]) if len(sys.argv) >= 6 else 1.0
-    P.DATANAME = sys.argv[6] if len(sys.argv) >= 7 else 'METRLA'
-    P.seed_SS = int(sys.argv[7]) if len(sys.argv) >= 8 else -1
-    P.IS_DESEASONED = bool(int(sys.argv[8])) if len(sys.argv) >= 9 else True
-    P.weight_decay = float(sys.argv[9]) if len(sys.argv) >= 10 else 0.0
-    P.adp_adj = bool(int(sys.argv[10])) if len(sys.argv) >= 11 else True
-    P.is_SGA = bool(int(sys.argv[11])) if len(sys.argv) >= 12 else True
-    P.FEATURES = int(sys.argv[12]) if len(sys.argv) >= 13 else 4
-    P.SUBGRAPH_SIZE = int(sys.argv[13]) if len(sys.argv) >= 14 else 64
-    P.QUOTIENT_GRAPH_RADIUS = float(sys.argv[14]) if len(sys.argv) >= 15 else 0.01
-    P.PRETRN_EPOCH = int(sys.argv[15]) if len(sys.argv) >= 16 else 100
-    P.EPOCH = int(sys.argv[16]) if len(sys.argv) >= 17 else 100
-    P.NETWORK_CALLS = bool(int(sys.argv[17])) if len(sys.argv) >= 18 else 0
-    P.PRE_LEARN = float(sys.argv[18]) if len(sys.argv) >= 19 else P.LEARN
-    P.GRAPH_NORM = bool(int(sys.argv[19])) if len(sys.argv) >= 20 else True
-    P.HIDDEN = int(sys.argv[20]) if len(sys.argv) >= 21 else 320
+    def _str2bool(v):
+        if isinstance(v, bool):
+            return v
+        s = str(v).strip().lower()
+        if s in ('1', 'true', 'yes', 'y', 't'):
+            return True
+        if s in ('0', 'false', 'no', 'n', 'f'):
+            return False
+        raise argparse.ArgumentTypeError(f'Boolean value expected, got {v!r}')
+
+    parser = argparse.ArgumentParser(description='Training/inference parameters')
+    parser.add_argument('--IS_PRETRN', type=_str2bool, default=True)
+    parser.add_argument('--R_TRN', type=float, default=0.7)
+    parser.add_argument('--IS_EPOCH_1', type=_str2bool, default=False)
+    parser.add_argument('--seed', type=int, default=100)
+    parser.add_argument('--TEMPERATURE', type=float, default=1.0)
+    parser.add_argument('--DATANAME', type=str, default='METRLA')
+    parser.add_argument('--seed_SS', type=int, default=-1)
+    parser.add_argument('--IS_DESEASONED', type=_str2bool, default=True)
+    parser.add_argument('--weight_decay', type=float, default=0.0)
+    parser.add_argument('--adp_adj', type=_str2bool, default=True)
+    parser.add_argument('--is_SGA', type=_str2bool, default=True)
+    parser.add_argument('--FEATURES', type=int, default=4)
+    parser.add_argument('--SUBGRAPH_SIZE', type=int, default=64)
+    parser.add_argument('--QUOTIENT_GRAPH_RADIUS', type=float, default=0.01)
+    parser.add_argument('--PRETRN_EPOCH', type=int, default=100)
+    parser.add_argument('--EPOCH', type=int, default=100)
+    parser.add_argument('--NETWORK_CALLS', type=_str2bool, default=False)
+    parser.add_argument('--PRE_LEARN', type=float, default=None,
+                        help='if not provided, falls back to P.LEARN')
+    parser.add_argument('--GRAPH_NORM', type=_str2bool, default=True)
+    parser.add_argument('--HIDDEN', type=int, default=320)
+    args = parser.parse_args()
+    print('parsed args:', vars(args))
+
+    P.IS_PRETRN = args.IS_PRETRN
+    P.R_TRN = args.R_TRN
+    P.IS_EPOCH_1 = args.IS_EPOCH_1
+    P.seed = args.seed
+    P.TEMPERATURE = args.TEMPERATURE
+    P.DATANAME = args.DATANAME
+    P.seed_SS = args.seed_SS
+    P.IS_DESEASONED = args.IS_DESEASONED
+    P.weight_decay = args.weight_decay
+    P.adp_adj = args.adp_adj
+    P.is_SGA = args.is_SGA
+    P.FEATURES = args.FEATURES
+    P.SUBGRAPH_SIZE = args.SUBGRAPH_SIZE
+    P.QUOTIENT_GRAPH_RADIUS = args.QUOTIENT_GRAPH_RADIUS
+    P.PRETRN_EPOCH = args.PRETRN_EPOCH
+    P.EPOCH = args.EPOCH
+    P.NETWORK_CALLS = args.NETWORK_CALLS
+    P.PRE_LEARN = args.PRE_LEARN if args.PRE_LEARN is not None else P.LEARN
+    P.GRAPH_NORM = args.GRAPH_NORM
+    P.HIDDEN = args.HIDDEN
 
 device = torch.device('cuda:0') 
 #device = torch.device("cpu")

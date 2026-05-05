@@ -1,4 +1,5 @@
 import sys
+import argparse
 import os
 import shutil
 import numpy as np
@@ -1136,46 +1137,95 @@ def get_argv():
     11: is_SGA
     12: FEATURES
     '''
-    print('sys.argv', sys.argv)
-    P.IS_PRETRN = bool(int(sys.argv[1])) if len(sys.argv) >= 2 else True
-    P.R_TRN = float(sys.argv[2]) if len(sys.argv) >= 3 else 0.7
-    P.IS_EPOCH_1 = bool(int(sys.argv[3])) if len(sys.argv) >= 4 else False
-    P.seed = int(sys.argv[4]) if len(sys.argv) >= 5 else 100
-    P.TEMPERATURE = float(sys.argv[5]) if len(sys.argv) >= 6 else 1.0
-    P.DATANAME = sys.argv[6] if len(sys.argv) >= 7 else 'METRLA'
-    P.seed_SS = int(sys.argv[7]) if len(sys.argv) >= 8 else -1
-    P.IS_DESEASONED = bool(int(sys.argv[8])) if len(sys.argv) >= 9 else True
-    P.weight_decay = float(sys.argv[9]) if len(sys.argv) >= 10 else 0.01
-    P.adp_adj = bool(int(sys.argv[10])) if len(sys.argv) >= 11 else True
-    P.is_SGA = bool(int(sys.argv[11])) if len(sys.argv) >= 12 else True
-    P.FEATURES = int(sys.argv[12]) if len(sys.argv) >= 13 else 2
-    P.SUBGRAPH_SIZE = int(sys.argv[13]) if len(sys.argv) >= 14 else 64
-    P.QUOTIENT_GRAPH_RADIUS = float(sys.argv[14]) if len(sys.argv) >= 15 else 0.01
-    P.PRETRN_EPOCH = int(sys.argv[15]) if len(sys.argv) >= 16 else 100
-    P.EPOCH = int(sys.argv[16]) if len(sys.argv) >= 17 else 100
-    P.NETWORK_CALLS = bool(int(sys.argv[17])) if len(sys.argv) >= 18 else 0
-    P.PRE_LEARN = float(sys.argv[18]) if len(sys.argv) >= 19 else P.LEARN
-    P.GRAPH_NORM = bool(int(sys.argv[19])) if len(sys.argv) >= 20 else True
-    P.HIDDEN = int(sys.argv[20]) if len(sys.argv) >= 21 else 320
-    P.IS_DUAL_PRETRN = bool(int(sys.argv[21])) if len(sys.argv) >= 22 else False
-    P.FUSE_ALPHA = float(sys.argv[22]) if len(sys.argv) >= 23 else 0.5
-    P.SKIP_PRETRAIN = bool(int(sys.argv[23])) if len(sys.argv) >= 24 else False
-    P.TEMP_ENCODER_NAME = sys.argv[24] if len(sys.argv) >= 25 else 'encoder'
-    P.GEO_ENCODER_NAME = sys.argv[25] if len(sys.argv) >= 26 else ('encoderg' if P.IS_DUAL_PRETRN else 'encoder')
-    P.PRETRAIN_CKPT_DIR = sys.argv[26] if len(sys.argv) >= 27 else ''
-    P.PRETRN_MODE = sys.argv[27] if len(sys.argv) >= 28 else 'temporal'#'dual'#'temporal'#('dual' if P.IS_DUAL_PRETRN else 'geo')
+    def _str2bool(v):
+        if isinstance(v, bool):
+            return v
+        s = str(v).strip().lower()
+        if s in ('1', 'true', 'yes', 'y', 't'):
+            return True
+        if s in ('0', 'false', 'no', 'n', 'f'):
+            return False
+        raise argparse.ArgumentTypeError(f'Boolean value expected, got {v!r}')
+
+    parser = argparse.ArgumentParser(description='Training/inference parameters')
+    parser.add_argument('--IS_PRETRN', type=_str2bool, default=True)
+    parser.add_argument('--R_TRN', type=float, default=0.7)
+    parser.add_argument('--IS_EPOCH_1', type=_str2bool, default=False)
+    parser.add_argument('--seed', type=int, default=100)
+    parser.add_argument('--TEMPERATURE', type=float, default=1.0)
+    parser.add_argument('--DATANAME', type=str, default='METRLA')
+    parser.add_argument('--seed_SS', type=int, default=-1)
+    parser.add_argument('--IS_DESEASONED', type=_str2bool, default=True)
+    parser.add_argument('--weight_decay', type=float, default=0.01)
+    parser.add_argument('--adp_adj', type=_str2bool, default=True)
+    parser.add_argument('--is_SGA', type=_str2bool, default=True)
+    parser.add_argument('--FEATURES', type=int, default=2)
+    parser.add_argument('--SUBGRAPH_SIZE', type=int, default=64)
+    parser.add_argument('--QUOTIENT_GRAPH_RADIUS', type=float, default=0.01)
+    parser.add_argument('--PRETRN_EPOCH', type=int, default=100)
+    parser.add_argument('--EPOCH', type=int, default=100)
+    parser.add_argument('--NETWORK_CALLS', type=_str2bool, default=False)
+    parser.add_argument('--PRE_LEARN', type=float, default=None,
+                        help='if not provided, falls back to P.LEARN')
+    parser.add_argument('--GRAPH_NORM', type=_str2bool, default=True)
+    parser.add_argument('--HIDDEN', type=int, default=320)
+    parser.add_argument('--IS_DUAL_PRETRN', type=_str2bool, default=False)
+    parser.add_argument('--FUSE_ALPHA', type=float, default=0.5)
+    parser.add_argument('--SKIP_PRETRAIN', type=_str2bool, default=False)
+    parser.add_argument('--TEMP_ENCODER_NAME', type=str, default='encoder')
+    parser.add_argument('--GEO_ENCODER_NAME', type=str, default=None,
+                        help="if not provided, defaults to 'encoderg' when --IS_DUAL_PRETRN, else 'encoder'")
+    parser.add_argument('--PRETRAIN_CKPT_DIR', type=str, default='')
+    parser.add_argument('--PRETRN_MODE', type=str, default='temporal')
+    parser.add_argument('--FUSION_MODE', type=str, default='temporal_delta')
+    parser.add_argument('--GATE_SCALE', type=float, default=1.0)
+    parser.add_argument('--GATE_BIAS', type=float, default=0.0)
+    parser.add_argument('--GATE_HIDDEN', type=int, default=64)
+    parser.add_argument('--FUSION_NORM', type=_str2bool, default=True)
+    parser.add_argument('--GATE_REG', type=float, default=0.0)
+    parser.add_argument('--DELTA_REG', type=float, default=0.0)
+    args = parser.parse_args()
+    print('parsed args:', vars(args))
+
+    P.IS_PRETRN = args.IS_PRETRN
+    P.R_TRN = args.R_TRN
+    P.IS_EPOCH_1 = args.IS_EPOCH_1
+    P.seed = args.seed
+    P.TEMPERATURE = args.TEMPERATURE
+    P.DATANAME = args.DATANAME
+    P.seed_SS = args.seed_SS
+    P.IS_DESEASONED = args.IS_DESEASONED
+    P.weight_decay = args.weight_decay
+    P.adp_adj = args.adp_adj
+    P.is_SGA = args.is_SGA
+    P.FEATURES = args.FEATURES
+    P.SUBGRAPH_SIZE = args.SUBGRAPH_SIZE
+    P.QUOTIENT_GRAPH_RADIUS = args.QUOTIENT_GRAPH_RADIUS
+    P.PRETRN_EPOCH = args.PRETRN_EPOCH
+    P.EPOCH = args.EPOCH
+    P.NETWORK_CALLS = args.NETWORK_CALLS
+    P.PRE_LEARN = args.PRE_LEARN if args.PRE_LEARN is not None else P.LEARN
+    P.GRAPH_NORM = args.GRAPH_NORM
+    P.HIDDEN = args.HIDDEN
+    P.IS_DUAL_PRETRN = args.IS_DUAL_PRETRN
+    P.FUSE_ALPHA = args.FUSE_ALPHA
+    P.SKIP_PRETRAIN = args.SKIP_PRETRAIN
+    P.TEMP_ENCODER_NAME = args.TEMP_ENCODER_NAME
+    P.GEO_ENCODER_NAME = args.GEO_ENCODER_NAME if args.GEO_ENCODER_NAME is not None else ('encoderg' if P.IS_DUAL_PRETRN else 'encoder')
+    P.PRETRAIN_CKPT_DIR = args.PRETRAIN_CKPT_DIR
+    P.PRETRN_MODE = args.PRETRN_MODE
     # dual pretraining trains two different encoders (temporal + geometric).
     # If their ckpt filenames are identical, the second one overwrites the first,
     # and later loading will fail with missing/unexpected keys.
     if P.PRETRN_MODE == 'dual' and P.GEO_ENCODER_NAME == P.TEMP_ENCODER_NAME:
         P.GEO_ENCODER_NAME = P.TEMP_ENCODER_NAME + '_geo'
-    P.FUSION_MODE = sys.argv[28] if len(sys.argv) >= 29 else 'temporal_delta'
-    P.GATE_SCALE = float(sys.argv[29]) if len(sys.argv) >= 30 else 1.0
-    P.GATE_BIAS = float(sys.argv[30]) if len(sys.argv) >= 31 else 0.0
-    P.GATE_HIDDEN = int(sys.argv[31]) if len(sys.argv) >= 32 else 64
-    P.FUSION_NORM = bool(int(sys.argv[32])) if len(sys.argv) >= 33 else True
-    P.GATE_REG = float(sys.argv[33]) if len(sys.argv) >= 34 else 0.0
-    P.DELTA_REG = float(sys.argv[34]) if len(sys.argv) >= 35 else 0.0
+    P.FUSION_MODE = args.FUSION_MODE
+    P.GATE_SCALE = args.GATE_SCALE
+    P.GATE_BIAS = args.GATE_BIAS
+    P.GATE_HIDDEN = args.GATE_HIDDEN
+    P.FUSION_NORM = args.FUSION_NORM
+    P.GATE_REG = args.GATE_REG
+    P.DELTA_REG = args.DELTA_REG
 
 device = torch.device('cuda:0') 
 ###########################################################
