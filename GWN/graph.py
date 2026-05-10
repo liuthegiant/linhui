@@ -4,7 +4,6 @@ from scipy import spatial
 from pprint import pprint
 import shapely
 import csv
-import osmnx as ox
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -18,6 +17,13 @@ from sklearn.preprocessing import MinMaxScaler
 from scipy import stats
 
 MODES = ['identity', 'rbf', 'rbf-osm', 'osm', 'osm-length', 'osm-length-speed']
+
+# `osmnx` (and its Geo stack) is only needed for OSM-based graph modes.
+# Keep the import optional so non-OSM runs don't require heavy geo deps.
+try:
+    import osmnx as ox  # type: ignore
+except Exception:  # pragma: no cover
+    ox = None
 
 """
 Load the traffic dataset's locations.
@@ -72,6 +78,11 @@ Output:
 - gdf_edges: a graph containing information about the traffic edges.
 """
 def load_osm(nodes):
+    if ox is None:
+        raise ImportError(
+            "osmnx is required for OSM-based graph modes (rbf-osm/osm/osm-length/osm-length-speed). "
+            "Please install osmnx (and dependencies) or use a non-OSM mode."
+        )
     # convex hull
     hull = shapely.convex_hull(MultiPoint(list(nodes.values()))).buffer(0.01)
 

@@ -3,3 +3,12 @@
 !METRLA/*.h5
 # ignore PEMSBAY datasets
 PEMSBAY/*.h5
+
+# local env / caches / logs
+.venv/
+**/__pycache__/
+**/*.pyc
+GWN/logs_topomoe/
+GWN/cache/
+save/
+*.log
