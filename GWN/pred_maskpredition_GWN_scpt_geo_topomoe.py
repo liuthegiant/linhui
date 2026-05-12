@@ -54,6 +54,60 @@ def _expert_arg(default_spec, argv_idx):
     return _parse_experts(raw)
 
 
+
+def _fmt_tag_float(x):
+    try:
+        out = ("%.4g" % float(x))
+    except Exception:
+        out = str(x)
+    return out.replace('-', 'm').replace('.', 'p')
+
+
+def _safe_tag(s):
+    keep = []
+    for ch in str(s):
+        keep.append(ch if ch.isalnum() or ch in ('_', '-', '.') else '_')
+    tag = ''.join(keep).strip('._-')
+    return tag or 'run'
+
+
+def _apply_moe_run_tag(P, task_prefix):
+    """Put every MoE setting in its own output directory to avoid overwriting checkpoints/results.
+
+    Environment variables:
+      MOE_RUN_TAG=custom_name     explicit tag; recommended for sweeps
+      MOE_AUTO_TAG=0              disable automatic subfolder tagging
+    """
+    explicit = os.environ.get('MOE_RUN_TAG', '').strip()
+    auto = os.environ.get('MOE_AUTO_TAG', '1').strip() != '0'
+    if explicit:
+        tag = explicit
+    elif auto:
+        short = {'temporal': 'scpt', 'geometric': 'geo', 'topology': 'topo'}
+        experts = '-'.join(short.get(x, x) for x in getattr(P, 'MOE_EXPERTS', []))
+        tag = (f"{task_prefix}_{getattr(P, 'FUSION_MODE', 'moe')}_{experts}"
+               f"_k{getattr(P, 'MOE_TOP_K', 0)}"
+               f"_tau{_fmt_tag_float(getattr(P, 'MOE_TAU', 1.0))}"
+               f"_lb{_fmt_tag_float(getattr(P, 'MOE_LB_REG', 0.0))}"
+               f"_sm{_fmt_tag_float(getattr(P, 'MOE_SMOOTH_REG', 0.0))}"
+               f"_dl{_fmt_tag_float(getattr(P, 'MOE_DELTA_REG', 0.0))}")
+    else:
+        tag = ''
+    # NOTE: The original base scripts set P.PATH later inside main().
+    # When called during get_argv(), P.PATH may not exist yet.
+    if not hasattr(P, 'PATH'):
+        P.MOE_BASE_PATH = None
+        P.MOE_RUN_TAG = _safe_tag(tag) if tag else ''
+        return
+    P.MOE_BASE_PATH = P.PATH
+    if tag:
+        P.MOE_RUN_TAG = _safe_tag(tag)
+        P.PATH = os.path.join(P.PATH, P.MOE_RUN_TAG)
+        os.makedirs(P.PATH, exist_ok=True)
+        print(f'[TopoMoE] output dir: {P.PATH}')
+    else:
+        P.MOE_RUN_TAG = ''
+
 def get_argv_topomoe_estimation():
     _ORIG_GET_ARGV()
     P = est.P
@@ -72,7 +126,8 @@ def get_argv_topomoe_estimation():
     P.MOE_FORCE_EXPERT = os.environ.get('MOE_FORCE_EXPERT', '').strip()
     P.MOE_INIT_TEMPORAL_BIAS = float(os.environ.get('MOE_INIT_TEMPORAL_BIAS', '1.0'))
     P.TOPO_FORCE_RECOMPUTE = _bool(os.environ.get('TOPO_FORCE_RECOMPUTE', '0'))
-    print('[TopoMoE estimation]', {k: getattr(P, k) for k in ['FUSION_MODE','MOE_EXPERTS','GATE_HIDDEN','TOPO_LAP_K','MOE_TOP_K','MOE_TAU','MOE_LB_REG','MOE_SMOOTH_REG','MOE_DELTA_REG','MOE_USE_CTX']})
+    _apply_moe_run_tag(P, 'est')
+    print('[TopoMoE estimation]', {k: getattr(P, k) for k in ['FUSION_MODE','MOE_EXPERTS','GATE_HIDDEN','TOPO_LAP_K','MOE_TOP_K','MOE_TAU','MOE_LB_REG','MOE_SMOOTH_REG','MOE_DELTA_REG','MOE_USE_CTX','MOE_RUN_TAG']})
 
 
 def _enabled():

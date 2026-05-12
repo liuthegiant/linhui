@@ -80,7 +80,7 @@ Base estimation command, with the extra MoE arguments after the original 20 argu
 
 ```bash
 python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -91,7 +91,7 @@ Use environment variables before this command to pick the embeddings.
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,geo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   sparse_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -100,7 +100,7 @@ MOE_EXPERTS=scpt,geo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -109,7 +109,7 @@ MOE_EXPERTS=scpt,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=geo,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -118,7 +118,7 @@ MOE_EXPERTS=geo,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,geo,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -127,17 +127,17 @@ MOE_EXPERTS=scpt,geo,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
 ```bash
 # SCPT only through the same MoE path
 MOE_EXPERTS=scpt MOE_TOP_K=1 python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 
 # GEO only through the same MoE path
 MOE_EXPERTS=geo MOE_TOP_K=1 python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 
 # TOPO only through the same MoE path
 MOE_EXPERTS=topo MOE_TOP_K=1 python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -145,7 +145,7 @@ MOE_EXPERTS=topo MOE_TOP_K=1 python pred_maskpredition_GWN_scpt_geo_topomoe.py \
 
 ```bash
 MOE_EXPERTS=scpt,geo,topo python pred_maskpredition_GWN_scpt_geo_topomoe.py \
-  1 0.7 1 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 1 1 0 0.01 1 320 \
+  1 0.7 1 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 1 1 0 0.001 1 320 \
   topo_moe 64 16 2 1.0 0.001 0.001 0.0 1
 ```
 
@@ -159,7 +159,7 @@ Base forecasting command:
 
 ```bash
 python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -171,7 +171,7 @@ Use environment variables before this command to pick the embeddings.
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,geo python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual sparse_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -181,7 +181,7 @@ MOE_EXPERTS=scpt,geo python pred_GWN_16_adpAdj_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,topo python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -191,7 +191,7 @@ MOE_EXPERTS=scpt,topo python pred_GWN_16_adpAdj_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=geo,topo python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -201,7 +201,7 @@ MOE_EXPERTS=geo,topo python pred_GWN_16_adpAdj_topomoe.py \
 ```bash
 cd /path/to/linhui/GWN
 MOE_EXPERTS=scpt,geo,topo python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -211,19 +211,19 @@ MOE_EXPERTS=scpt,geo,topo python pred_GWN_16_adpAdj_topomoe.py \
 ```bash
 # SCPT only
 MOE_EXPERTS=scpt MOE_TOP_K=1 python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 
 # GEO only
 MOE_EXPERTS=geo MOE_TOP_K=1 python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 
 # TOPO only
 MOE_EXPERTS=topo MOE_TOP_K=1 python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 100 100 0 0.01 1 320 \
+  1 0.7 0 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 100 100 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
@@ -232,7 +232,7 @@ MOE_EXPERTS=topo MOE_TOP_K=1 python pred_GWN_16_adpAdj_topomoe.py \
 
 ```bash
 MOE_EXPERTS=scpt,geo,topo python pred_GWN_16_adpAdj_topomoe.py \
-  1 0.7 1 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.001 1 1 0 0.01 1 320 \
+  1 0.7 1 100 1.0 METRLA -1 1 0.0 1 1 2 64 0.01 1 1 0 0.001 1 320 \
   1 0.5 0 encoder encoderg "" dual topo_moe 1.0 0.0 64 1 0.0 0.0 \
   16 2 1.0 0.001 0.001 0.0 1
 ```
