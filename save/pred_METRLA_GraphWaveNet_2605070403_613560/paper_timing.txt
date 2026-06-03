@@ -1,0 +1,53 @@
+=== PAPER_TIMING (wall-clock seconds unless noted) ===
+pretrain_geo_sec: 0.000
+pretrain_temporal_sec: 0.000
+pretrain_total_sec: 0.000
+core_pipeline_sec (pretrain+main_train+test_u+test_a): 3577.422
+main_train_sec: 3557.657
+main_train_epoch_time_mean_sec: 35.576
+forecast_model_params (trainable): 330061
+fusion_module_params (trainable): 0
+test_u_all_sec (load+infer+metrics): 6.573
+test_u_eval_forward_sec: 3.3317
+test_u_predict_forward_sec: 2.4796
+test_u_predict_throughput_samples_per_s: 2755.27
+test_a_all_sec (load+infer+metrics): 13.192
+test_a_eval_forward_sec: 5.2938
+test_a_predict_forward_sec: 4.4904
+test_a_predict_throughput_samples_per_s: 1521.48
+script_wall_sec: 3596.053
+(saved ../save/pred_METRLA_GraphWaveNet_2605070403_613560/paper_timing.json)
+
+=== TIME SUMMARY (training & inference) ===
+[Overall — wall clock]
+  script_wall_sec: 3596.053
+  pretrain_total_sec: 0.000
+  main_train_sec: 3557.657
+  test_u_all_sec: 6.573
+  test_a_all_sec: 13.192
+
+[Epoch — pretrain geometric]
+  per-epoch duration: (n/a)
+
+[Iteration — pretrain geometric, per inner step]
+  batch/step: (n/a)
+
+[Epoch — pretrain temporal]
+  per-epoch duration: (n/a)
+
+[Iteration — pretrain temporal, per mini-batch]
+  batch: (n/a)
+
+[Epoch — main forecast training]
+  per-epoch duration: n=100, mean=35.576s, stdev=1.224s, min=32.210s, max=39.017s
+
+[Iteration — main forecast training, per train batch]
+  batch: n=37500, mean=0.0713s, stdev=0.0075s, sum=2672.815s, min=0.0404s, max=0.5135s
+
+[Inference test_u — per DataLoader batch]
+  eval (validation forward): n=107, mean=0.0212s, stdev=0.0170s, sum=2.266s, min=0.0130s, max=0.1316s
+  predict (test forward): n=107, mean=0.0157s, stdev=0.0061s, sum=1.675s, min=0.0124s, max=0.0448s
+
+[Inference test_a — per DataLoader batch]
+  eval (validation forward): n=107, mean=0.0196s, stdev=0.0149s, sum=2.098s, min=0.0128s, max=0.1271s
+  predict (test forward): n=107, mean=0.0130s, stdev=0.0006s, sum=1.396s, min=0.0126s, max=0.0170s

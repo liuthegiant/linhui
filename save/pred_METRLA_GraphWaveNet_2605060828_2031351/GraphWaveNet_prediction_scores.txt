@@ -1,0 +1,5 @@
+GraphWaveNet, train, MAE on train, 1.1184690044e-01, 0.1118469004
+GraphWaveNet, test_u, Torch MSE, 1.1072986076e-01, 0.1107298608
+masked positions, GraphWaveNet, test_u, MSE, RMSE, MAE, MAPE, 18.3617763519, 4.2850643346, 2.2431998253, 0.0469525084
+GraphWaveNet, test_a, Torch MSE, 1.1264115779e-01, 0.1126411578
+masked positions, GraphWaveNet, test_a, MSE, RMSE, MAE, MAPE, 18.7399864197, 4.3289705958, 2.2823364735, 0.0458843336
