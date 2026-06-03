@@ -10,7 +10,7 @@ class SpatialSplit:
         self.r_val = r_val
         self.r_tst = r_tst
         np.random.seed(seed=seed) # reset the RNG
-        if r_trn + r_val + r_tst<1.0:
+        if r_trn + r_val + r_tst<1.0+ 1e-9:
             # no replacement
             indices = np.arange(length)
             np.random.shuffle(indices)

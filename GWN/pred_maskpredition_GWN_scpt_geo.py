@@ -180,8 +180,20 @@ def setups_estimation(missing_ratio=0.4):
         torch.utils.data.TensorDataset(
             torch.tensor(trainYS[:,-1,spatialSplit_unseen.i_val,0]).T.float()),
         P.BATCHSIZE, shuffle=False)
-    pretrn_iterg = random.sample(list(spatialSplit_unseen.i_trn), P.BATCHSIZE)
+    if not hasattr(P, "GEO_PRETRAIN_TRAIN_ONLY"):
+        env_geo = os.environ.get("GEO_PRETRAIN_TRAIN_ONLY", "1").strip().lower()
+        P.GEO_PRETRAIN_TRAIN_ONLY = env_geo not in ("0", "false", "no")
+    if P.GEO_PRETRAIN_TRAIN_ONLY:
+        geo_pool = list(spatialSplit_unseen.i_trn)
+    else:
+        geo_pool = list(range(int(data.shape[1])))
+    k_geo = min(P.BATCHSIZE, len(geo_pool))
+    pretrn_iterg = random.sample(geo_pool, k_geo)
     preval_iterg = list(spatialSplit_unseen.i_val)
+    print(
+        f"[geo-pretrain] GEO_PRETRAIN_TRAIN_ONLY={P.GEO_PRETRAIN_TRAIN_ONLY} "
+        f"pool={len(geo_pool)} batch={k_geo}"
+    )
 
     # 输出参数检查
     for k, v in vars(P).items():
@@ -840,9 +852,16 @@ def main():
     get_argv()
 
     # === 路径设置 ===
+    eval_dir = os.environ.get("FORECASTING_EVAL_DIR", "").strip()
+    eval_mode = os.environ.get("FORECASTING_EVAL_MODE", "").strip()
+    # Backward compatible shortcut: only-eval tst_a
     eval_tst_a_dir = os.environ.get("FORECASTING_EVAL_TST_A_DIR", "").strip()
-    if eval_tst_a_dir:
-        P.PATH = os.path.abspath(eval_tst_a_dir)
+    if eval_tst_a_dir and not eval_dir:
+        eval_dir = eval_tst_a_dir
+        eval_mode = eval_mode or "tst_a"
+
+    if eval_dir:
+        P.PATH = os.path.abspath(eval_dir)
         P.KEYWORD = os.path.basename(P.PATH.rstrip("/"))
     else:
         P.KEYWORD = 'est_' + P.DATANAME + '_' + P.MODELNAME + '_' + datetime.now().strftime("%y%m%d%H%M") + '_' + str(os.getpid())
@@ -923,17 +942,35 @@ def main():
 
     mapping_tst_a = {old: new for new, old in enumerate(spatialSplit_allNod.i_tst)}
 
-    if eval_tst_a_dir:
-        print(P.KEYWORD, 'eval tst_a only (FORECASTING_EVAL_TST_A_DIR)', time.ctime())
+    if eval_dir:
+        mode = eval_mode or "tst_a"
+        print(P.KEYWORD, f"eval only mode={mode} (FORECASTING_EVAL_DIR)", time.ctime())
+
+        if mode == "tst_a":
+            test_iter = tst_a_iter
+            node_indices = spatialSplit_allNod.i_tst
+            adj = adj_tst_a
+            mapping = mapping_tst_a
+            ssplit = spatialSplit_allNod
+        elif mode == "tst_v_full":
+            # Provided by custom setups_estimation (e.g. virtual-node splitmask entrypoint).
+            test_iter = getattr(P, "TST_V_FULL_ITER")
+            node_indices = getattr(P, "TST_V_FULL_NODES")
+            adj = getattr(P, "TST_V_FULL_ADJ")
+            mapping = getattr(P, "TST_V_FULL_MAPPING")
+            ssplit = getattr(P, "TST_V_FULL_SPATIALSPLIT", spatialSplit_allNod)
+        else:
+            raise ValueError(f"Unsupported FORECASTING_EVAL_MODE={mode!r}")
+
         testModel_estimation_with_pretrain(
             name=P.MODELNAME,
-            mode="tst_a",
-            test_iter=tst_a_iter,
-            node_indices=spatialSplit_allNod.i_tst,
+            mode=mode,
+            test_iter=test_iter,
+            node_indices=node_indices,
             scaler=scaler,
-            adj_tst_u=adj_tst_a,
-            mapping=mapping_tst_a,
-            spatialsplit=spatialSplit_allNod,
+            adj_tst_u=adj,
+            mapping=mapping,
+            spatialsplit=ssplit,
         )
         print('SCRIPT DURATION', datetime.now() - script_start_time)
         return
